@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4 shadow">
+    <h3 class="mb-3">Update Expense</h3>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input name="dname" class="form-control" value="{{ expense['name'] }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input name="demail" class="form-control" value="{{ expense['email'] }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Expense Amount</label>
+            <input name="expense" type="number" class="form-control" value="{{ expense['expense'] }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Product</label>
+            <input name="product" class="form-control" value="{{ expense['product'] }}" required>
+        </div>
+
+        <button class="btn btn-primary">Update</button>
+        <a href="{{ url_for('view_expenses') }}" class="btn btn-secondary">Cancel</a>
+
+    </form>
+</div>
+{% endblock %}

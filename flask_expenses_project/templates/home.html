@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Welcome{{ ", " + session.get('user_name') if session.get('user_name') else "" }}!</h1>
+<p>This is the home page. Use the navbar to navigate.</p>
+{% endblock %}
