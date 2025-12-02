@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Profile</h3>
+<form method="post" action="{{ url_for('profile') }}">
+  <div class="mb-3">
+    <label>Name</label>
+    <input class="form-control" name="name" value="{{ myuser[1] }}" required>
+  </div>
+  <div class="mb-3">
+    <label>Email (read-only)</label>
+    <input class="form-control" value="{{ myuser[2] }}" readonly>
+  </div>
+  <button class="btn btn-primary">Save</button>
+</form>
+{% endblock %}
