@@ -46,17 +46,43 @@ def login():
         flash("Invalid credentials", "danger")
     return render_template('login.html')
 
+# Registration and checking of the user whether they are already exist or not
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        #  Check password match
+        if password != confirm_password:
+            flash("Passwords do not match!", "danger")
+            return redirect(url_for('register'))
+
+        cursor = conn.cursor(buffered=True)
+
+        #  Check if email already exists
+        cursor.execute("SELECT id FROM login_data WHERE email=%s", (email,))
+        existing = cursor.fetchone()
+
+        if existing:
+            flash("Email already registered!", "warning")
+            return redirect(url_for('register'))
+
+        #  Hash password
         hashed = generate_password_hash(password)
-        cursor.execute("INSERT INTO login_data (name, email, password) VALUES (%s,%s,%s)", (name, email, hashed))
+
+        #  Insert user
+        cursor.execute(
+            "INSERT INTO login_data (name, email, password) VALUES (%s,%s,%s)",
+            (name, email, hashed)
+        )
         conn.commit()
-        flash("Registered successfully. Please login.", "success")
+
+        flash("Registered successfully! Please login.", "success")
         return redirect(url_for('login'))
+
     return render_template('register.html')
 
 @app.route('/logout')
