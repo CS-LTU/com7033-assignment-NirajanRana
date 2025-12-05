@@ -8,10 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <body class="bg-nav">
+    <nav class="navbar navbar-expand-lg bg-nav bg-light mb-4">
       <div class="container">
-        <a class="navbar-brand" href="{{ url_for('home') }}">ExpensesApp</a>
+        <a class="navbar-brand  btn btn-outline-primary btn-sm" href="{{ url_for('home') }}">ExpensesApp</a>
         <div>
           {% if session.get('user_id') %}
             <span class="me-2">Hi, {{ session.get('user_name') }}</span>
@@ -21,7 +21,7 @@
             <a class="btn btn-outline-success btn-sm" href="{{ url_for('addexpenses') }}">Add</a>
 
             <!-- 👇 NEW: Update Password Button -->
-            <a class="btn btn-outline-warning btn-sm" href="{{ url_for('update_password') }}">Update Password</a>
+            <a class="btn btn-outline-danger btn-sm" href="{{ url_for('update_password') }}">Update Password</a>
 
 
             <a class="btn btn-outline-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>

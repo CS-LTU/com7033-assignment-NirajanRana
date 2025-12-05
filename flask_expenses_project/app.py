@@ -27,10 +27,14 @@ client = MongoClient(MONGO_URI)
 db = client['db1']
 collection = db['expenses']
 
+
+# Login homepage
 @app.route("/")
 def index():
     return redirect(url_for('login'))
 
+
+# Login validation
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
@@ -85,6 +89,7 @@ def register():
 
     return render_template('register.html')
 
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
@@ -97,6 +102,14 @@ def home():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template('home.html')
+
+# Dashboard
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
+
 
 # Profile (MySQL)
 @app.route('/profile', methods=['GET','POST'])
@@ -113,6 +126,7 @@ def profile():
     cursor.execute("SELECT id, name, email FROM login_data WHERE id=%s", (user_id,))
     myuser = cursor.fetchone()
     return render_template('profile.html', myuser=myuser)
+
 
 # MongoDB CRUD for expenses
 @app.route('/addexpenses', methods=['GET','POST'])
@@ -132,11 +146,15 @@ def addexpenses():
         return redirect(url_for('view_expenses'))
     return render_template('addexpenses.html')
 
+
+
 @app.route('/expenses')
 def view_expenses():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template('expenses.html')
+
+
 
 @app.route('/api/expenses', methods=['GET'])
 def api_get_expenses():
@@ -151,12 +169,15 @@ def api_get_expenses():
         data.append(doc)
     return jsonify(data)
 
+
+
 @app.route('/api/expense', methods=['POST'])
 def api_create_expense():
     payload = request.get_json()
     payload['user_id'] = session.get('user_id')
     res = collection.insert_one(payload)
     return jsonify({"id": str(res.inserted_id)}), 201
+
 
 @app.route('/api/expense/<id>', methods=['PUT','DELETE'])
 def api_modify_expense(id):
@@ -170,12 +191,8 @@ def api_modify_expense(id):
         collection.delete_one({"_id": ObjectId(id)})
         return jsonify({"status":"deleted"})
 
-# Dashboard
-@app.route('/dashboard')
-def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html')
+
+
 
 # Simple search endpoint
 @app.route('/get_users', methods=['POST'])
@@ -238,6 +255,7 @@ def update_password():
 
     return render_template('update_password.html')
 
+
 # Update expenses
 
 @app.route('/update_expense/<id>', methods=['GET', 'POST'])
@@ -271,6 +289,7 @@ def update_expense(id):
 
     # GET = Load form
     return render_template("update_expense.html", expense=expense)
+
 
 
 
