@@ -290,7 +290,35 @@ def update_expense(id):
     # GET = Load form
     return render_template("update_expense.html", expense=expense)
 
+@app.route('/delete_user/<int:id>', methods=['GET'])
+def delete_user(id):
+    # Ensure only logged-in users or admins can delete
+    if 'user_id' not in session:
+        flash("You must be logged in.", "danger")
+        return redirect(url_for('login'))
 
+    cur = conn.cursor(buffered=True)
+
+    # Check if user exists
+    cur.execute("SELECT id FROM login_data WHERE id=%s", (id,))
+    user = cur.fetchone()
+
+    if not user:
+        flash("User not found!", "danger")
+        return redirect(url_for('users'))  # Change route if needed
+
+    # Perform delete
+    cur.execute("DELETE FROM login_data WHERE id=%s", (id,))
+    conn.commit()
+
+    flash("User deleted successfully!", "success")
+
+    # If the logged-in user deleted themselves → logout
+    if session.get('user_id') == id:
+        session.clear()
+        return redirect(url_for('login'))
+
+    return redirect(url_for('users'))  # Replace with your user list route
 
 
 
