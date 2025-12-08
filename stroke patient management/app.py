@@ -92,6 +92,41 @@ def register():
     return render_template('register.html')
 
 
+# ------------------ PASSWORD UPDATE ------------------
+@app.route('/update_password', methods=['GET', 'POST'])
+def update_password():
+    if 'user_id' not in session:
+        return redirect('/login')
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        confirm_new_password = request.form.get('confirm_new_password')
+
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT password FROM login_data WHERE id=%s", (user_id,))
+            user = cursor.fetchone()
+            if not user:
+                flash("User not found", "danger")
+                return redirect(url_for('update_password'))
+
+            if not check_password_hash(user[0], old_password):
+                flash("Old password is incorrect", "danger")
+                return redirect(url_for('update_password'))
+
+            if new_password != confirm_new_password:
+                flash("New passwords do not match", "danger")
+                return redirect(url_for('update_password'))
+
+            new_hashed = generate_password_hash(new_password)
+            cursor.execute("UPDATE login_data SET password=%s WHERE id=%s", (new_hashed, user_id))
+            conn.commit()
+
+        flash("Password updated successfully!", "success")
+        return redirect(url_for('logout'))
+
+    return render_template('update_password.html')
 
 # ------------------ RUN ------------------
 if __name__ == '__main__':

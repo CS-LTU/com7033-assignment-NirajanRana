@@ -18,9 +18,9 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
       <div class="container">
 
-        <!-- Logo -->
-        <a class="navbar-brand fw-bold" href="{{ url_for('login') }}">
-          Stroke Patient Management
+        <!-- Logo / Home -->
+        <a class="navbar-brand fw-bold" href="{{ url_for('home') if session.get('user_id') else url_for('login') }}">
+          MyApp
         </a>
 
         <div>
@@ -28,13 +28,16 @@
             <span class="me-3 fw-semibold">Hi, {{ session.get('user_name') }}</span>
 
             <!-- Home -->
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('home') }}">Home</a>
+            <a class="btn btn-outline-primary btn-sm me-1" href="{{ url_for('home') }}">Home</a>
+
+            <!-- Update Password -->
+            <a class="btn btn-outline-warning btn-sm me-1" href="{{ url_for('update_password') }}">Update Password</a>
 
             <!-- Logout -->
             <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
 
           {% else %}
-            <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Login</a>
+            <a class="btn btn-primary btn-sm me-1" href="{{ url_for('login') }}">Login</a>
             <a class="btn btn-secondary btn-sm" href="{{ url_for('register') }}">Register</a>
           {% endif %}
         </div>
