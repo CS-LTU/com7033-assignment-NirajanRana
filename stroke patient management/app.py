@@ -19,6 +19,15 @@ MYSQL_CONFIG = {
 # MySQL Connection
 conn = mysql.connector.connect(**MYSQL_CONFIG)
 
+# Mongodb
+MONGO_URI= os.environ.get("MONGO_URI", "mongodb+srv://root:root@cluster0.ynbmbkb.mongodb.net/?appName=Cluster0")
+
+
+# MongoDB Connection
+client = MongoClient(MONGO_URI)
+db = client['patient_data']
+collection = db['Patient_data']
+
 # ------------------ ROUTES ---------=---------
 
 @app.route("/")
@@ -151,6 +160,25 @@ def delete_user(id):
     session.pop('user_name', None)
     return redirect(url_for('login'))
 
+# ------------------ PROFILE ------------------
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE login_data SET name=%s WHERE id=%s", (name, user_id))
+            conn.commit()
+        session['user_name'] = name
+        flash("Profile updated", "success")
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT id, name, email FROM login_data WHERE id=%s", (user_id,))
+        myuser = cursor.fetchone()
+    return render_template('profile.html', myuser=myuser)
 
 
 # ------------------ RUN ------------------
