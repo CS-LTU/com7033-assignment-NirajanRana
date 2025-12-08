@@ -181,6 +181,81 @@ def profile():
     return render_template('profile.html', myuser=myuser)
 
 
+
+# ------------------ PATIENT DATA ------------------
+@app.route('/patient_data')
+def view_patient_data():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('patient_data.html')
+
+
+@app.route('/add_patient_data', methods=['GET', 'POST'])
+def add_patient_data():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        try:
+            doc = {
+                "user_id": session['user_id'],
+                "id": int(request.form.get('id')),
+                "gender": request.form.get('gender'),
+                "age": int(request.form.get('age')),
+                "hypertension": int(request.form.get('hypertension')),
+                "heart_disease": int(request.form.get('heart_disease')),
+                "ever_married": request.form.get('ever_married'),
+                "work_type": request.form.get('work_type'),
+                "Residence_type": request.form.get('Residence_type'),
+                "avg_glucose_level": float(request.form.get('avg_glucose_level')),
+                "bmi": float(request.form.get('bmi')),
+                "smoking_status": request.form.get('smoking_status'),
+                "stroke": int(request.form.get('stroke'))
+            }
+        except ValueError:
+            flash("Please enter valid numeric values", "danger")
+            return redirect(url_for('add_patient_data'))
+
+        collection.insert_one(doc)
+        flash("Record added successfully", "success")
+        return redirect(url_for('view_patient_data'))
+
+    return render_template('add_patient_data.html')
+
+
+# ------------------ API ENDPOINTS ------------------
+@app.route('/api/patient_data', methods=['GET'])
+def api_get_patient_data():
+    mine = request.args.get('mine')
+    query = {}
+    if mine == '1' and 'user_id' in session:
+        query['user_id'] = session['user_id']
+
+    data = []
+    for doc in collection.find(query):
+        doc['_id'] = str(doc['_id'])
+        data.append(doc)
+
+    return jsonify(data)
+
+
+@app.route('/api/patient_data', methods=['POST'])
+def api_create_patient_data():
+    payload = request.get_json()
+    payload['user_id'] = session.get('user_id')
+    res = collection.insert_one(payload)
+    return jsonify({"id": str(res.inserted_id)}), 201
+
+
+@app.route('/get_users', methods=['POST'])
+def get_user():
+    username = request.form.get("username")
+    user = collection.find_one({"name": username})
+    if user:
+        user["_id"] = str(user["_id"])
+        return jsonify(user)
+    return jsonify({"error": "User not found"}), 404
+
 # ------------------ RUN ------------------
 if __name__ == '__main__':
     app.run(debug=True)

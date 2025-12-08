@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">Patient Data</h3>
+
+
+    <table id="tbl" class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Hypertension</th>
+                <th>Heart Disease</th>
+                <th>Ever Married</th>
+                <th>Work Type</th>
+                <th>Residence Type</th>
+                <th>Avg Glucose Level</th>
+                <th>BMI</th>
+                <th>Smoking Status</th>
+                <th>Stroke</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Link to external JS -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
