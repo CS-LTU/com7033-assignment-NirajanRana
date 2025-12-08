@@ -128,6 +128,31 @@ def update_password():
 
     return render_template('update_password.html')
 
+
+# ------------------ DELETE USER ------------------
+@app.route('/delete_user/<int:id>', methods=['GET'])
+def delete_user(id):
+    if 'user_id' not in session:
+        flash("You must be logged in.", "danger")
+        return redirect(url_for('login'))
+
+    with conn.cursor(buffered=True) as cursor:
+        cursor.execute("SELECT id FROM login_data WHERE id=%s", (id,))
+        user = cursor.fetchone()
+        if not user:
+            flash("User not found!", "danger")
+            return redirect(url_for('login'))
+
+        cursor.execute("DELETE FROM login_data WHERE id=%s", (id,))
+        conn.commit()
+
+    flash("User deleted successfully", "success")
+    session.pop('user_id', None)
+    session.pop('user_name', None)
+    return redirect(url_for('login'))
+
+
+
 # ------------------ RUN ------------------
 if __name__ == '__main__':
     app.run(debug=True)

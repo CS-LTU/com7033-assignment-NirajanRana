@@ -20,7 +20,7 @@
 
         <!-- Logo / Home -->
         <a class="navbar-brand fw-bold" href="{{ url_for('home') if session.get('user_id') else url_for('login') }}">
-          MyApp
+          Stroke patient management
         </a>
 
         <div>
@@ -32,6 +32,13 @@
 
             <!-- Update Password -->
             <a class="btn btn-outline-warning btn-sm me-1" href="{{ url_for('update_password') }}">Update Password</a>
+
+                      <!-- Delete Account -->
+            <a class="btn btn-outline-danger btn-sm"
+               href="{{ url_for('delete_user', id=session.get('user_id')) }}"
+               onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone?')">
+              Delete Account
+            </a>
 
             <!-- Logout -->
             <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
