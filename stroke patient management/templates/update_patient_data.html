@@ -1,73 +1,152 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="card p-4 shadow">
-    <h3 class="mb-3">Update Patient Data</h3>
 
-    <form method="POST">
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">ID</label>
-                <input name="id" type="number" class="form-control" value="{{ patient['id'] }}" required>
+<div class="d-flex justify-content-center mt-4">
+    <div class="col-md-8">
+
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0">Update Patient Data</h4>
             </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Gender</label>
-                <input name="gender" class="form-control" value="{{ patient['gender'] }}" required>
-            </div>
+            <div class="card-body p-4">
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Age</label>
-                <input name="age" type="number" class="form-control" value="{{ patient['age'] }}" required>
-            </div>
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Hypertension</label>
-                <input name="hypertension" type="number" class="form-control" value="{{ patient['hypertension'] }}" required>
-            </div>
+                <form method="POST">
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Heart Disease</label>
-                <input name="heart_disease" type="number" class="form-control" value="{{ patient['heart_disease'] }}" required>
-            </div>
+                    <div class="row">
+                        <!-- ID -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Patient ID</label>
+                            <input class="form-control" name="id" type="number" value="{{ patient['id'] }}" required>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Ever Married</label>
-                <input name="ever_married" class="form-control" value="{{ patient['ever_married'] }}" required>
-            </div>
+                        <!-- Gender -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gender</label>
+                            <select class="form-control" name="gender" required>
+                                <option value="">Select</option>
+                                <option {% if patient['gender']=='Male' %}selected{% endif %}>Male</option>
+                                <option {% if patient['gender']=='Female' %}selected{% endif %}>Female</option>
+                                <option {% if patient['gender']=='Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Work Type</label>
-                <input name="work_type" class="form-control" value="{{ patient['work_type'] }}" required>
-            </div>
+                        <!-- Age -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Age</label>
+                            <input class="form-control" name="age" type="number" value="{{ patient['age'] }}" required>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Residence Type</label>
-                <input name="Residence_type" class="form-control" value="{{ patient['Residence_type'] }}" required>
-            </div>
+                        <!-- Hypertension -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hypertension</label>
+                            <select class="form-control" name="hypertension" required>
+                                <option value="">Select</option>
+                                <option value="0" {% if patient['hypertension']==0 %}selected{% endif %}>No</option>
+                                <option value="1" {% if patient['hypertension']==1 %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Average Glucose Level</label>
-                <input name="avg_glucose_level" type="number" step="0.01" class="form-control" value="{{ patient['avg_glucose_level'] }}" required>
-            </div>
+                        <!-- Heart Disease -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Heart Disease</label>
+                            <select class="form-control" name="heart_disease" required>
+                                <option value="">Select</option>
+                                <option value="0" {% if patient['heart_disease']==0 %}selected{% endif %}>No</option>
+                                <option value="1" {% if patient['heart_disease']==1 %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">BMI</label>
-                <input name="bmi" type="number" step="0.01" class="form-control" value="{{ patient['bmi'] }}" required>
-            </div>
+                        <!-- Ever Married -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ever Married</label>
+                            <select class="form-control" name="ever_married" required>
+                                <option value="">Select</option>
+                                <option {% if patient['ever_married']=='Yes' %}selected{% endif %}>Yes</option>
+                                <option {% if patient['ever_married']=='No' %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Smoking Status</label>
-                <input name="smoking_status" class="form-control" value="{{ patient['smoking_status'] }}" required>
-            </div>
+                        <!-- Work Type -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Work Type</label>
+                            <select class="form-control" name="work_type" required>
+                                <option value="">Select</option>
+                                <option {% if patient['work_type']=='Private' %}selected{% endif %}>Private</option>
+                                <option {% if patient['work_type']=='Self-employed' %}selected{% endif %}>Self-employed</option>
+                                <option {% if patient['work_type']=='Govt_job' %}selected{% endif %}>Govt_job</option>
+                                <option {% if patient['work_type']=='Children' %}selected{% endif %}>Children</option>
+                                <option {% if patient['work_type']=='Never_worked' %}selected{% endif %}>Never_worked</option>
+                            </select>
+                        </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Stroke</label>
-                <input name="stroke" type="number" class="form-control" value="{{ patient['stroke'] }}" required>
+                        <!-- Residence Type -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Residence Type</label>
+                            <select class="form-control" name="Residence_type" required>
+                                <option value="">Select</option>
+                                <option {% if patient['Residence_type']=='Urban' %}selected{% endif %}>Urban</option>
+                                <option {% if patient['Residence_type']=='Rural' %}selected{% endif %}>Rural</option>
+                            </select>
+                        </div>
+
+                        <!-- Average Glucose Level -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Average Glucose Level</label>
+                            <input class="form-control" name="avg_glucose_level" type="number" step="0.01" value="{{ patient['avg_glucose_level'] }}" required>
+                        </div>
+
+                        <!-- BMI -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">BMI</label>
+                            <input class="form-control" name="bmi" type="number" step="0.01" value="{{ patient['bmi'] }}" required>
+                        </div>
+
+                        <!-- Smoking Status -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Smoking Status</label>
+                            <select class="form-control" name="smoking_status" required>
+                                <option value="">Select</option>
+                                <option {% if patient['smoking_status']=='formerly smoked' %}selected{% endif %}>formerly smoked</option>
+                                <option {% if patient['smoking_status']=='never smoked' %}selected{% endif %}>never smoked</option>
+                                <option {% if patient['smoking_status']=='smokes' %}selected{% endif %}>smokes</option>
+                                <option {% if patient['smoking_status']=='Unknown' %}selected{% endif %}>Unknown</option>
+                            </select>
+                        </div>
+
+                        <!-- Stroke -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Stroke</label>
+                            <select class="form-control" name="stroke" required>
+                                <option value="">Select</option>
+                                <option value="0" {% if patient['stroke']==0 %}selected{% endif %}>No</option>
+                                <option value="1" {% if patient['stroke']==1 %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <button class="btn btn-primary w-100 py-2">Update Patient Data</button>
+                    <a href="{{ url_for('view_patient_data') }}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+
+                </form>
+
             </div>
         </div>
 
-        <button class="btn btn-primary">Update Patient Data</button>
-        <a href="{{ url_for('view_patient_data') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
 </div>
+
 {% endblock %}

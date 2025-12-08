@@ -15,6 +15,47 @@ MYSQL_CONFIG = {
     "password": os.environ.get("MYSQL_PASSWORD", "root"),
     "database": os.environ.get("MYSQL_DB", "loginvalidation"),
 }
+
+# ============================================
+#      AUTO CREATE MYSQL DATABASE + TABLES
+# ============================================
+def initialize_mysql():
+    # Connect without database to create it
+    conn = mysql.connector.connect(
+        host=MYSQL_CONFIG["host"],
+        user=MYSQL_CONFIG["user"],
+        password=MYSQL_CONFIG["password"]
+    )
+    cursor = conn.cursor()
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {MYSQL_CONFIG['database']}")
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    #  Connect with database to create tables
+    conn = mysql.connector.connect(**MYSQL_CONFIG)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS login_data (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100),
+            email VARCHAR(100) UNIQUE,
+            password VARCHAR(255)
+        )
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+# Initialize MySQL before creating global conn
+initialize_mysql()
+
+# Now create MySQL connection (DATABASE EXISTS)
+conn = mysql.connector.connect(**MYSQL_CONFIG)
+
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://root:root@cluster0.ynbmbkb.mongodb.net/?appName=Cluster0")
 
 # MySQL Connection
