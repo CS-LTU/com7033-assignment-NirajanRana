@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "User Login System" }}</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+
+  <body class="bg-light">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+      <div class="container">
+
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold" href="{{ url_for('login') }}">
+          Stroke Patient Management
+        </a>
+
+        <div>
+          {% if session.get('user_id') %}
+            <span class="me-3 fw-semibold">Hi, {{ session.get('user_name') }}</span>
+
+            <!-- Home -->
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('home') }}">Home</a>
+
+            <!-- Logout -->
+            <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
+
+          {% else %}
+            <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Login</a>
+            <a class="btn btn-secondary btn-sm" href="{{ url_for('register') }}">Register</a>
+          {% endif %}
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- FLASH MESSAGES -->
+    <div class="container mb-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-dismissible fade show alert-{{ cat }}" role="alert">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
