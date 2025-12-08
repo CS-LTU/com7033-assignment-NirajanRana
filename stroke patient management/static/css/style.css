@@ -1,0 +1,10 @@
+body { padding-bottom: 40px; }
+
+
+
+.bg-nav {
+background: #2980B9;
+background: linear-gradient(to right, #2980B9, #6DD5FA, #FFFFFF);
+background: -webkit-linear-gradient(to right, #2980B9, #6DD5FA, #FFFFFF);
+
+}

@@ -4,6 +4,11 @@
 <div class="container mt-4">
     <h3 class="mb-3">Patient Data</h3>
 
+    <div class="mb-3">
+        <button id="loadMine" class="btn btn-primary">My Records</button>
+        <button id="loadAll" class="btn btn-secondary">All Records</button>
+        <a href="{{ url_for('add_patient_data') }}" class="btn btn-success">Add New Patient</a>
+    </div>
 
     <table id="tbl" class="table table-bordered table-striped">
         <thead class="table-dark">

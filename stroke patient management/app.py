@@ -15,39 +15,23 @@ MYSQL_CONFIG = {
     "password": os.environ.get("MYSQL_PASSWORD", "root"),
     "database": os.environ.get("MYSQL_DB", "loginvalidation"),
 }
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://root:root@cluster0.ynbmbkb.mongodb.net/?appName=Cluster0")
 
 # MySQL Connection
 conn = mysql.connector.connect(**MYSQL_CONFIG)
-
-# Mongodb
-MONGO_URI= os.environ.get("MONGO_URI", "mongodb+srv://root:root@cluster0.ynbmbkb.mongodb.net/?appName=Cluster0")
-
 
 # MongoDB Connection
 client = MongoClient(MONGO_URI)
 db = client['patient_data']
 collection = db['Patient_data']
 
-# ------------------ ROUTES ---------=---------
+
+# ------------------ ROUTES ------------------
 
 @app.route("/")
 def index():
     return redirect(url_for('login'))
 
-# ------------------ HOME ------------------
-@app.route('/home')
-def home():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('home.html')
-
-# ------------------ LOGOUT ------------------
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    session.pop('user_name', None)
-    flash("Logged out", "info")
-    return redirect(url_for('login'))
 
 # ------------------ LOGIN ------------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -101,6 +85,44 @@ def register():
     return render_template('register.html')
 
 
+# ------------------ LOGOUT ------------------
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session.pop('user_name', None)
+    flash("Logged out", "info")
+    return redirect(url_for('login'))
+
+
+# ------------------ HOME ------------------
+@app.route('/home')
+def home():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('home.html')
+
+
+# ------------------ PROFILE ------------------
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE login_data SET name=%s WHERE id=%s", (name, user_id))
+            conn.commit()
+        session['user_name'] = name
+        flash("Profile updated", "success")
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT id, name, email FROM login_data WHERE id=%s", (user_id,))
+        myuser = cursor.fetchone()
+    return render_template('profile.html', myuser=myuser)
+
+
 # ------------------ PASSWORD UPDATE ------------------
 @app.route('/update_password', methods=['GET', 'POST'])
 def update_password():
@@ -136,50 +158,6 @@ def update_password():
         return redirect(url_for('logout'))
 
     return render_template('update_password.html')
-
-
-# ------------------ DELETE USER ------------------
-@app.route('/delete_user/<int:id>', methods=['GET'])
-def delete_user(id):
-    if 'user_id' not in session:
-        flash("You must be logged in.", "danger")
-        return redirect(url_for('login'))
-
-    with conn.cursor(buffered=True) as cursor:
-        cursor.execute("SELECT id FROM login_data WHERE id=%s", (id,))
-        user = cursor.fetchone()
-        if not user:
-            flash("User not found!", "danger")
-            return redirect(url_for('login'))
-
-        cursor.execute("DELETE FROM login_data WHERE id=%s", (id,))
-        conn.commit()
-
-    flash("User deleted successfully", "success")
-    session.pop('user_id', None)
-    session.pop('user_name', None)
-    return redirect(url_for('login'))
-
-# ------------------ PROFILE ------------------
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    user_id = session['user_id']
-
-    if request.method == 'POST':
-        name = request.form.get('name')
-        with conn.cursor() as cursor:
-            cursor.execute("UPDATE login_data SET name=%s WHERE id=%s", (name, user_id))
-            conn.commit()
-        session['user_name'] = name
-        flash("Profile updated", "success")
-
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT id, name, email FROM login_data WHERE id=%s", (user_id,))
-        myuser = cursor.fetchone()
-    return render_template('profile.html', myuser=myuser)
-
 
 
 # ------------------ PATIENT DATA ------------------
@@ -223,6 +201,91 @@ def add_patient_data():
     return render_template('add_patient_data.html')
 
 
+# ------------------ UPDATE PATIENT DATA ------------------
+@app.route('/update_patient_data/<id>', methods=['GET', 'POST'])
+def update_patient_data(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    patient = collection.find_one({"_id": ObjectId(id)})
+    if not patient:
+        flash("Record not found", "danger")
+        return redirect(url_for('view_patient_data'))
+
+    if request.method == 'POST':
+        try:
+            updated_data = {
+                "id": int(request.form.get("id")),
+                "gender": request.form.get("gender"),
+                "age": int(request.form.get("age")),
+                "hypertension": int(request.form.get("hypertension")),
+                "heart_disease": int(request.form.get("heart_disease")),
+                "ever_married": request.form.get("ever_married"),
+                "work_type": request.form.get("work_type"),
+                "Residence_type": request.form.get("Residence_type"),
+                "avg_glucose_level": float(request.form.get("avg_glucose_level")),
+                "bmi": float(request.form.get("bmi")),
+                "smoking_status": request.form.get("smoking_status"),
+                "stroke": int(request.form.get("stroke"))
+            }
+        except ValueError:
+            flash("Please enter valid numeric values", "danger")
+            return redirect(url_for('update_patient_data', id=id))
+
+        collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
+        flash("Record updated successfully!", "success")
+        return redirect(url_for('view_patient_data'))
+
+    return render_template("update_patient_data.html", patient=patient)
+
+# delete patient_data
+@app.route('/api/patient_data/<id>', methods=['DELETE'])
+def api_delete_patient(id):
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        obj_id = ObjectId(id)
+    except:
+        return jsonify({"error": "Invalid ID format"}), 400
+
+    # Ensure user only deletes their own records
+    record = collection.find_one({"_id": obj_id})
+
+    if not record:
+        return jsonify({"error": "Record not found"}), 404
+
+    if record.get("user_id") != session['user_id']:
+        return jsonify({"error": "Not allowed"}), 403
+
+    collection.delete_one({"_id": obj_id})
+
+    return jsonify({"success": True}), 200
+
+
+# ------------------ DELETE USER ------------------
+@app.route('/delete_user/<int:id>', methods=['GET'])
+def delete_user(id):
+    if 'user_id' not in session:
+        flash("You must be logged in.", "danger")
+        return redirect(url_for('login'))
+
+    with conn.cursor(buffered=True) as cursor:
+        cursor.execute("SELECT id FROM login_data WHERE id=%s", (id,))
+        user = cursor.fetchone()
+        if not user:
+            flash("User not found!", "danger")
+            return redirect(url_for('login'))
+
+        cursor.execute("DELETE FROM login_data WHERE id=%s", (id,))
+        conn.commit()
+
+    flash("User deleted successfully", "success")
+    session.pop('user_id', None)
+    session.pop('user_name', None)
+    return redirect(url_for('login'))
+
+
 # ------------------ API ENDPOINTS ------------------
 @app.route('/api/patient_data', methods=['GET'])
 def api_get_patient_data():
@@ -255,6 +318,7 @@ def get_user():
         user["_id"] = str(user["_id"])
         return jsonify(user)
     return jsonify({"error": "User not found"}), 404
+
 
 # ------------------ RUN ------------------
 if __name__ == '__main__':

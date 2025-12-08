@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4 shadow">
+    <h3 class="mb-3">Update Patient Data</h3>
+
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">ID</label>
+                <input name="id" type="number" class="form-control" value="{{ patient['id'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Gender</label>
+                <input name="gender" class="form-control" value="{{ patient['gender'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Age</label>
+                <input name="age" type="number" class="form-control" value="{{ patient['age'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Hypertension</label>
+                <input name="hypertension" type="number" class="form-control" value="{{ patient['hypertension'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Heart Disease</label>
+                <input name="heart_disease" type="number" class="form-control" value="{{ patient['heart_disease'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Ever Married</label>
+                <input name="ever_married" class="form-control" value="{{ patient['ever_married'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Work Type</label>
+                <input name="work_type" class="form-control" value="{{ patient['work_type'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Residence Type</label>
+                <input name="Residence_type" class="form-control" value="{{ patient['Residence_type'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Average Glucose Level</label>
+                <input name="avg_glucose_level" type="number" step="0.01" class="form-control" value="{{ patient['avg_glucose_level'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">BMI</label>
+                <input name="bmi" type="number" step="0.01" class="form-control" value="{{ patient['bmi'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Smoking Status</label>
+                <input name="smoking_status" class="form-control" value="{{ patient['smoking_status'] }}" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Stroke</label>
+                <input name="stroke" type="number" class="form-control" value="{{ patient['stroke'] }}" required>
+            </div>
+        </div>
+
+        <button class="btn btn-primary">Update Patient Data</button>
+        <a href="{{ url_for('view_patient_data') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

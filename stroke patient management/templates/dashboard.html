@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Dashboard</h3>
+<canvas id="barChart" height="120"></canvas>
+
+<script>
+async function loadData() {
+  const res = await fetch('/api/expenses?mine=1');
+  const data = await res.json();
+
+  // aggregate by product
+  const byProduct = {};
+  data.forEach(d => {
+    const p = d.product || "Unknown";
+    byProduct[p] = (byProduct[p] || 0) + (Number(d.expense) || 0);
+  });
+
+  const labels = Object.keys(byProduct);
+  const values = labels.map(l => byProduct[l]);
+
+  new Chart(document.getElementById('barChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Expense by Product',
+        data: values,
+        backgroundColor: 'rgba(0, 200, 0, 0.6)',
+        borderColor: 'rgba(0, 150, 0, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+loadData();
+</script>
+{% endblock %}
