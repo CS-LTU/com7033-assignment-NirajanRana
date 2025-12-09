@@ -360,6 +360,18 @@ def get_user():
         return jsonify(user)
     return jsonify({"error": "User not found"}), 404
 
+# For the doctor
+
+# Doctor Login
+@app.route('/doctor_login',methods=['GET','POST'])
+def doctor_login():
+    return render_template("doctor_login.html")
+
+# Doctor Register
+@app.route('/doctor_register',methods=['GET','POST'])
+def doctor_register():
+    return render_template("doctor_register.html")
+
 
 # ------------------ RUN ------------------
 if __name__ == '__main__':

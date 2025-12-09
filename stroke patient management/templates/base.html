@@ -53,8 +53,10 @@
             <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
 
           {% else %}
-            <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Login</a>
-            <a class="btn btn-secondary btn-sm" href="{{ url_for('register') }}">Register</a>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('doctor_login') }}">Doctor Login</a>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Patient Login</a>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('register') }}">Patient Register</a>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('doctor_register') }}">Doctor Register</a>
           {% endif %}
         </div>
 
