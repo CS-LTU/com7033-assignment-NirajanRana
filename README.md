@@ -58,7 +58,7 @@ Download from: https://www.python.org/downloads/
 
 ## **2️⃣ Clone the Project**
 ```bash
-git clone https://github.com/your-repo/stroke-patient-management.git
+git clone https://github.com/CS-LTU/com7033-assignment-NirajanRana
 cd stroke-patient-management
 ```
 
