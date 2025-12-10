@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Welcome{{ ", " + session.get('user_name') if session.get('user_name') else "" }}!</h1>
+    <div class="mb-3">
+        <a href="{{ url_for('patient_data') }}" class="btn btn-success">My records</a>
+        <a href="{{ url_for('add_patient_data') }}" class="btn btn-success">Add New Patient</a>
+    </div>
 <p>This is the home page. Use the navbar to navigate.</p>
 {% endblock %}
