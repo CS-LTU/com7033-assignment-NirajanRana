@@ -1,155 +1,192 @@
-# Stroke Patient Management System
 
-A full-stack Flask application for managing user registrations, logins, and **Patient Data** storage. This system uses a **dual database architecture**: **MySQL** for user authentication and **MongoDB** for patient records.
+# Stroke Patient Management System  
+A full-stack Flask-based web application for managing stroke patient data with session-based authentication for Patients and Doctors.
+
+---
+
+## 📌 System Architecture Diagram
+
+```
+                       +-----------------------+
+                       |       User/Doctor     |
+                       +-----------+-----------+
+                                   |
+                                   v
+                         +-------------------+
+                         |     Flask App     |
+                         |  (app.py logic)   |
+                         +----+----------+---+
+                              |          |
+                     +--------+          +---------+
+                     v                          v
+         +-----------------------+     +------------------------+
+         |   MySQL Database     |     |     MongoDB Atlas      |
+         | (Users, Doctors)     |     | (Patient Medical Data) |
+         +-----------------------+     +------------------------+
+```
 
 ---
 
 ## 🚀 Features
 
-* **User Registration & Login (MySQL):** Secure user authentication using email and hashed passwords.
-* **Profile Management:** Users can update their name and change their password.
-* **Patient Data Management (MongoDB):** Users can Add, View , Update, and Delete patient records.
-* **Dual Database System:** Uses MySQL for user credentials and MongoDB for flexible patient data storage.
-* **REST API:** Endpoints for fetching and managing patient data (`/api/patient_data`).
-* **Secure Password Hashing** using `werkzeug.security`.
+### 👤 **User (Patient)**
+- Register / Login / Logout  
+- Update password  
+- Add, update, and delete personal patient records  
+- View personal dashboard  
+
+### 👨‍⚕️ **Doctor**
+- Register with secure doctor key  
+- Login / Logout  
+- View all patient records  
+- Add or update patient data  
+- Delete accounts  
+
+### 🔐 **Security**
+- Password hashing using `werkzeug.security`  
+- Session-based authentication  
+- Role-based access (user vs doctor)
 
 ---
 
-## 📦 Installation & Setup
+## 🛠 Installation & Setup Guide
 
-### 1️⃣ Clone the Repository
+### **1️⃣ Install Python (if not installed)**  
+Download from: https://www.python.org/downloads/
 
+---
+
+## **2️⃣ Clone the Project**
 ```bash
-git clone <repository_url> # Replace with your actual repository URL
-cd <project_directory>
+git clone https://github.com/your-repo/stroke-patient-management.git
+cd stroke-patient-management
 ```
 
-### 2️⃣ Install Required Libraries
+---
 
+## **3️⃣ Create a Virtual Environment**
+```bash
+python -m venv venv
+```
+
+### Activate:
+
+#### Windows:
+```bash
+venv\Scripts\activate
+```
+
+#### macOS/Linux:
+```bash
+source venv/bin/activate
+```
+
+---
+
+## **4️⃣ Install Required Libraries**
 Install all dependencies using:
 
 ```bash
-pip install -r requirements.txt
+pip install flask mysql-connector-python pymongo werkzeug dnspython
 ```
 
-(Key dependencies include: Flask, mysql-connector-python, pymongo, werkzeug).
+Full list of libraries used:
+```
+flask
+mysql-connector-python
+pymongo
+werkzeug
+dnspython
+```
 
-### 3️⃣ Configuration
+---
 
-The application uses environment variables for database connection details.
+## **5️⃣ Configure Databases**
 
-| Variable Name  | Default Value (in app.py) | Description                    |
-| -------------- | ------------------------- | ------------------------------ |
-| FLASK_SECRET   | os.urandom(24)            | Secret key for Flask sessions. |
-| MYSQL_HOST     | localhost                 | MySQL server host.             |
-| MYSQL_USER     | root                      | MySQL user.                    |
-| MYSQL_PASSWORD | root                      | MySQL password.                |
-| MYSQL_DB       | loginvalidation           | MySQL database name.           |
-| MONGO_URI      | mongodb+srv://...         | MongoDB connection string.     |
-
-### 🗄️ Database Setup
-
-#### 🟦 MySQL (User Authentication)
-
-Create the database (e.g., `loginvalidation`):
-
+### **🔥 MySQL Setup**
+Create a database named `loginvalidation`:
 ```sql
 CREATE DATABASE loginvalidation;
-USE loginvalidation;
 ```
 
-Create the `login_data` table for user credentials:
+Tables will be auto-created by the app:
+- `login_data`
+- `doctor_data`
 
-```sql
-CREATE TABLE login_data (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255) UNIQUE,
-    password VARCHAR(255)
-);
+### **🔥 MongoDB Setup**
+Use MongoDB Atlas URI:
+```
+mongodb+srv://<user>:<password>@cluster0.mongodb.net/
 ```
 
-#### 🍃 MongoDB (Patient Records)
+Make sure the database exists:
+```
+patient_data > Patient_data (collection)
+```
 
-The application connects to the database `patient_data` and stores records in the collection `Patient_data`.
-The patient data document structure includes attributes like: `id`, `gender`, `age`, `hypertension`, `heart_disease`, and is linked to the user via `user_id`.
+---
 
-### ▶️ Running the Application
+## **6️⃣ Set Environment Variables (Optional)**
 
-Ensure your MySQL and MongoDB servers are running and configured before starting the application.
+Create a `.env` file:
+```
+FLASK_SECRET=your_secret_key
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=root
+MYSQL_DB=loginvalidation
+MONGO_URI=your_mongo_uri
+```
 
+---
+
+## **7️⃣ Run the Application**
 ```bash
 python app.py
 ```
 
-The application will be accessible at:
+The app runs at:  
+👉 http://127.0.0.1:5000/
 
-```
-http://127.0.0.1:5000/
-```
+---
 
-## 🖼 System Design Architecture
+## 🧪 Testing Instructions
 
-Below is a high-level **System Architecture Diagram** representing the dual-database workflow:
-
-```
-                 ┌───────────────────────┐
-                 │        Client         │
-                 │  (Browser / UI)       │
-                 └──────────┬────────────┘
-                            │ HTTP Requests
-                            ▼
-                 ┌────────────────────────┐
-                 │        Flask App       │
-                 │  (Routing + Logic)     │
-                 └──────────┬────────────┘
-        ┌────────────────────┼─────────────────────┐
-        │                    │                     │
-        ▼                    ▼                     ▼
-┌──────────────┐     ┌────────────────┐     ┌────────────────┐
-│ Flask Session │     │   MySQL DB     │     │   MongoDB       │
-│  (user_id)    │     │(login_data tbl)│     │(Patient_data col)│
-└──────────────┘     └────────────────┘     └────────────────┘
-        │                    │                     │
-        │ Stores login       │ Stores hashed       │ CRUD Patient
-        │ session state      │ user credentials    │ Data per user
-        ▼                    ▼                     ▼
-        └────────────────────┴─────────────────────┘
+To run unit tests:
+```bash
+pytest -v
 ```
 
-### Data Flow Summary
+Test file included: `test.py`  
+This project includes:
+- **Session Tests**
+- **Route Access Tests**
+- **Role Isolation Tests**
 
-The application uses a Dual Database Architecture, separating user authentication from patient data storage for security and flexibility.
+---
 
-**Data Flow Summary**
-
-* **Authentication:** User login/registration interacts with the MySQL database to verify/store hashed credentials.
-* **Session Management:** Upon successful login, the `user_id` is stored in the secure Flask session.
-* **Data Persistence:** CRUD operations on patient records (Add, Update, Delete) are executed by Flask endpoints, which communicate with the MongoDB collection. Records are typically associated with the current user's `user_id`.
-
-## 📁 Project Structure
+## 📂 Project Folder Structure
 
 ```
-patient_management_project/
-│── app.py                # Main Flask application file (Routes, DB connections, Logic)
-│── requirements.txt      # Project dependencies
-│── README.md             # This file
-│── templates/
-│   ├── base.html         # Base template with navigation and layout
-│   ├── login.html        # User login form
-│   ├── register.html     # User registration form
-│   ├── home.html         # Application homepage
-│   ├── profile.html      # User profile update form
-│   ├── patient_data.html # Page to view/list patient data
-│   └── add_patient_data.html # Form to add new patient record
-│── static/
-│   ├── css/
-│   └── js/
-│       └── main.js       # Client-side JavaScript for fetching/displaying data
+/
+├── app.py
+├── templates/
+│   ├── login.html
+│   ├── register.html
+│   ├── doctor_login.html
+│   ├── home.html
+│   ├── doctor_home.html
+│   ├── profile.html
+│   └── ...
+├── static/
+├── test.py
+└── README.md
 ```
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Author  
+**Nirajan Rana**
 
-Nirajan Rana
+
+
