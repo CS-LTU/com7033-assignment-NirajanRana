@@ -251,7 +251,7 @@ def profile():
         cur.execute("SELECT id, name, email FROM login_data WHERE id=%s", (session["user_id"],))
         user = cur.fetchone()
 
-    return render_template("profile.html", myuser=user)
+    return render_template("profile.html", user=user)
 
 # Update Patient Password
 @app.route("/update_password", methods=["GET", "POST"])
@@ -282,7 +282,7 @@ def update_password():
             conn.commit()
 
         flash("Password updated.", "success")
-        return redirect(url_for("login"))
+        return redirect(url_for("logout"))
 
     return render_template("update_password.html")
 
@@ -307,6 +307,79 @@ def delete_user(id):
     session.clear()
     flash("Your account has been deleted.", "info")
     return redirect(url_for("login"))
+
+
+# Update doctor password
+@app.route("/doctor_update_password", methods=["GET", "POST"])
+def doctor_update_password():
+    if not session.get("doctor_id"):
+        return redirect(url_for("doctor_login"))
+
+    if request.method == "POST":
+        doc_old = request.form.get("doc_old_password")
+        doc_new = request.form.get("doc_new_password")
+        doc_confirm = request.form.get("doc_confirm_password")
+
+        # Fetch the hashed password safely
+        with conn.cursor() as cur:
+            cur.execute("SELECT password FROM doctor_data WHERE id=%s", (session["doctor_id"],))
+            result = cur.fetchone()
+
+        if not result:
+            flash("Doctor not found.", "danger")
+            return redirect(url_for("doctor_update_password"))
+
+        hashed = result[0]
+        if not hashed:
+            flash("Password not set. Contact admin.", "danger")
+            return redirect(url_for("doctor_update_password"))
+
+        # Check old password
+        if not check_password_hash(hashed, doc_old):
+            flash("Old password incorrect.", "danger")
+            return redirect(url_for("doctor_update_password"))
+
+        # Check new password confirmation
+        if doc_new != doc_confirm:
+            flash("New passwords do not match.", "danger")
+            return redirect(url_for("doctor_update_password"))
+
+        # Update password
+        new_hash = generate_password_hash(doc_new)
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE doctor_data SET password=%s WHERE id=%s",
+                (new_hash, session["doctor_id"])
+            )
+            conn.commit()
+
+        flash("Password updated successfully.", "success")
+        return redirect(url_for("doctor_logout"))  # stay on page after update
+
+    return render_template("doctor_update_password.html")
+
+
+# Delete Doctor  Account
+@app.route("/delete_doctor/<int:id>")
+def delete_doctor(id):
+    if not session.get("doctor_id"):
+        return redirect(url_for("doctor_login"))
+
+    if session["doctor_id"] != id:
+        flash("Unauthorized action.", "danger")
+        return redirect(url_for("doctor_home"))
+
+    # Delete patient records
+    collection.delete_many({"user_id": id})
+
+    # Delete SQL account
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM doctor_data WHERE id=%s", (id,))
+        conn.commit()
+
+    session.clear()
+    flash("Your account has been deleted.", "info")
+    return redirect(url_for("doctor_login"))
 
 # ---------------- PATIENT DATA ----------------
 

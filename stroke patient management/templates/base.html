@@ -42,6 +42,12 @@
                 <span class="me-3 fw-semibold">Hi, Dr. {{ session.get('doctor_name') }}</span>
                 <a class="btn btn-outline-primary btn-sm me-2" href="{{ url_for('patient_data') }}">Patient Data</a>
                 <a class="btn btn-outline-success btn-sm me-2" href="{{ url_for('add_patient_data') }}">Add Patient</a>
+                <a class="btn btn-outline-warning btn-sm me-2" href="{{ url_for('doctor_update_password') }}">Update Password</a>
+                <a class="btn btn-outline-danger btn-sm me-2"
+                   href="{{ url_for('delete_doctor', id=session.get('doctor_id')) }}"
+                   onclick="return confirm('Are you sure you want to delete your account?')">
+                   Delete Account
+                </a>
                 <a class="btn btn-danger btn-sm" href="{{ url_for('doctor_logout') }}">Logout</a>
 
             {% else %}
