@@ -46,6 +46,7 @@ A full-stack Flask-based web application for managing stroke patient data with s
 - Password hashing using `werkzeug.security`  
 - Session-based authentication  
 - Role-based access (user vs doctor)
+- Doctor Secret key is 2513161
 
 ---
 
