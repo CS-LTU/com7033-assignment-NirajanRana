@@ -242,16 +242,31 @@ def doctor_home():
 # ---------------- PATIENT PROFILE SYSTEM ----------------
 
 # View Profile
-@app.route("/profile")
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
+    user_id = session["user_id"]
+
     with conn.cursor() as cur:
-        cur.execute("SELECT id, name, email FROM login_data WHERE id=%s", (session["user_id"],))
+
+        # Handle Profile Update (POST request)
+        if request.method == "POST":
+            new_name = request.form.get("name")
+
+            cur.execute("UPDATE login_data SET name=%s WHERE id=%s", (new_name, user_id))
+            conn.commit()
+            flash("Profile updated successfully!", "success")
+
+            return redirect(url_for("logout"))
+
+       # Fetch updated user data
+        cur.execute("SELECT id, name, email FROM login_data WHERE id=%s", (user_id,))
         user = cur.fetchone()
 
-    return render_template("profile.html", user=user)
+    return render_template("profile.html", myuser=user)
+
 
 # Update Patient Password
 @app.route("/update_password", methods=["GET", "POST"])

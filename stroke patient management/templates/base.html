@@ -20,9 +20,9 @@
 <!-- NAVBAR -->
 <nav class="bg-nav navbar navbar-expand-lg bg-light shadow-sm mb-4">
     <div class="container">
-        <a class="navbar-brand btn btn-outline-primary btn-sm" href="{{ url_for('home') }}">
+        <button class="navbar-brand btn btn-outline-primary btn-sm" >
             Stroke Patient Management
-        </a>
+        </button>
 
         <div class="d-flex">
             {% if session.get('user_id') %}
